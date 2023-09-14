@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Request,Query,Body, Param,Header, SetMetadata, UseGuards} from '@nestjs/common';
+import { Controller, Post, Get, Request,Query,Body, Param,Header, SetMetadata, UseGuards, Put, Delete} from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/entity/user.entity';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -9,7 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 //API功能标注(swagger)
 @ApiTags("用户模块")
 // @UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth('jwt')
+// @ApiBearerAuth('jwt')
 export class UserController {
     constructor(private userService:UserService){}
 
@@ -46,9 +46,28 @@ export class UserController {
     // @SetMetadata( 'role', ['admin'])
     // @Role('admin')
     getUser(@Body() msg: any){
-        console.log(msg)
         return this.userService.getUser(msg)
     }
+
+    @Post("findUser")
+    //传统方法(设置元数据的装饰器)
+    // @SetMetadata( 'role', ['admin'])
+    // @Role('admin')
+    findUser(@Body() name: string){
+        return this.userService.getUser(name)
+    }
+
+    @Put("editUser/:id")
+    editUser(@Body() user: User, @Param('id') id: number){
+        console.log(id)
+        return this.userService.editUser(user, id)
+    }
+
+    @Delete("delUser/:id")
+    delUser( @Param('id') id: number){
+        return this.userService.delUser(id)
+    }
+
 }
 
 

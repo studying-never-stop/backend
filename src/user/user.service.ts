@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 //引入数据库
-import { Admin, Repository } from 'typeorm';
+import { Admin, ListCollectionsCursor, Repository, } from 'typeorm';
 //注入数据库
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entity/user.entity';
@@ -46,31 +46,91 @@ export class UserService {
     }
 
     public async getUser(msg: any){
-        console.log(msg)
-        return {
-            // if query == '':
-            //     cursor.execute("select * from users")
-            // else:
-            //     cursor.execute("select * from users where username = '" + query + "'")
-            // users = cursor.fetchall()
-            // cursor.execute("select count(*) from users ")
-            // total = cursor.fetchall()[0][0]
-            // showusers = users[(pagenum-1)*pagesize:pagenum*pagesize]
-            // thelist = []
-            // for i in showusers:
-            //     thelist.append({'ID':i[0],'username':i[1],'password':i[2],'email':i[3],'rolename':i[4],'mobile':i[5]})
-                
-            // return dumps({
-            //     'data':{
-            //     'total':total,
-            //     'pagenum':pagenum,
-            //     'users':thelist,
-            //     },
-            //     'meta' : {
-            //         'msg' : '传输成功',
-            //         'status' : 200
-            //     },
-            // })
+        const query: string = msg.query
+        const pagenum: number = msg.pagenum
+        const pagesize: number = msg.pagesize
+        let thelist = []
+        let total
+        
+        if(query == ''){
+            let allOfUser = await this.user
+            //选择哪张表
+            .createQueryBuilder("User")
+            .select( "User.id" ) //同sql语句，不过每个最多选两个多的要用adSelect()
+            .addSelect( 'User.name' )
+            .addSelect( 'User.phone' )
+            .addSelect( 'User.email' )
+            .addSelect( 'User.role' )
+            .addSelect( 'User.readtimes' )
+            // .addSelect('role' )
+            //同where的用法
+            // .where("user.id = :id", { id: 1 })
+            .getMany();
+
+        total = allOfUser.length
+        let startNumber: number = (pagenum-1)*pagesize
+        let endNumber: number = pagenum*pagesize < total ? pagenum*pagesize : total
+        for (let i = startNumber; i < endNumber; i++){
+            thelist.push(allOfUser[i])
+            } 
         }
+        else{
+            let findUser = await this.user.createQueryBuilder("User")
+            .select( "User.id" ) //同sql语句，不过每个最多选两个多的要用adSelect()
+            .addSelect( 'User.name' )
+            .addSelect( 'User.phone' )
+            .addSelect( 'User.email' )
+            .addSelect( 'User.role' )
+            .addSelect( 'User.readtimes' )
+            .where("User.name = :name", { name: query })
+            .orWhere("User.phone = :phone", { phone: query }) //或者用另一个where查询
+            .getOne();
+
+            thelist.push(findUser)
+            total = 1;
+        }
+        return {
+            code: 0,
+            msg: {
+                data: thelist,
+                total: total
+            }
+        }
+    }
+
+    public async editUser( user: User , id: number){
+        return await this.user
+        .createQueryBuilder("User")
+        .where("User.id = :id", {id: id})
+        .getOne()
+        .then( async (res: User) => {
+            return await this.user.createQueryBuilder('User')
+            .update(User)
+            .set(user)
+            .where("id = :id", { id: user.id })
+            .execute()
+            .then(() =>{
+                return this.response = {
+                    code: 0,
+                    msg: "用户修改成功",
+                }
+            })
+        })
+    }
+
+    public async delUser( id: number ){        
+          console.log(id)
+            return await this.user.createQueryBuilder('User')
+            .delete()
+            .from(User)
+            .where("id = :id", { id: id })
+            .execute()
+            .then(() =>{
+                return this.response = {
+                    code: 0,
+                    msg: "用户删除成功",
+                }
+            })
+        
     }
 }
