@@ -119,7 +119,6 @@ export class UserService {
     }
 
     public async delUser( id: number ){        
-          console.log(id)
             return await this.user.createQueryBuilder('User')
             .delete()
             .from(User)

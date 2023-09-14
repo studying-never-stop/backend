@@ -1,14 +1,14 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
-@Entity('User')
-export class User {
+@Entity('Book')
+export class Book {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: "varchar", length: 30 })
   name: string;
 
-  @Column({ type: "number" })
+  @Column({ type: "int", default: 0 })
   bereadtimes: number;
 
   @Column({ default: true })

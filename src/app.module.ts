@@ -11,6 +11,7 @@ import { BookService } from './book/book.service';
 import { BookController } from './book/book.controller';
 import { BookModule } from './book/book.module';
 import { MenuModule } from './menu/menu.module';
+import { Book } from './entity/book.entity';
 
 
 
@@ -24,13 +25,13 @@ import { MenuModule } from './menu/menu.module';
     username: 'root',
     password: 'wsy021031',
     database: 'library',
-    entities: [User],
+    entities: [User,Book],
     synchronize: true,
     //自动加载实体
     // autoLoadEntities:true,
   }), UserModule, AuthModule, BookModule, MenuModule,  ],
   controllers: [AppController, BookController],
-  providers: [AppService, RedisService, BookService],
+  providers: [AppService, RedisService],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
