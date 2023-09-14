@@ -41,12 +41,13 @@ export class UserController {
     //     return await this.userService.regist(userDto,userDto.phone)
     // }
 
-    @Get("hello")
+    @Post("getUser")
     //传统方法(设置元数据的装饰器)
     // @SetMetadata( 'role', ['admin'])
     // @Role('admin')
-    hello(){
-        return this.userService.hello()
+    getUser(@Body() msg: any){
+        console.log(msg)
+        return this.userService.getUser(msg)
     }
 }
 

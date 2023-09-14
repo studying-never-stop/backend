@@ -45,11 +45,32 @@ export class UserService {
         return await this.user.findOneBy({phone})
     }
 
-    public async hello(){
-        // return await this.redisService.set("management", "helloWord")
+    public async getUser(msg: any){
+        console.log(msg)
         return {
-            code: 0,
-            msg: "hello world!"
+            // if query == '':
+            //     cursor.execute("select * from users")
+            // else:
+            //     cursor.execute("select * from users where username = '" + query + "'")
+            // users = cursor.fetchall()
+            // cursor.execute("select count(*) from users ")
+            // total = cursor.fetchall()[0][0]
+            // showusers = users[(pagenum-1)*pagesize:pagenum*pagesize]
+            // thelist = []
+            // for i in showusers:
+            //     thelist.append({'ID':i[0],'username':i[1],'password':i[2],'email':i[3],'rolename':i[4],'mobile':i[5]})
+                
+            // return dumps({
+            //     'data':{
+            //     'total':total,
+            //     'pagenum':pagenum,
+            //     'users':thelist,
+            //     },
+            //     'meta' : {
+            //         'msg' : '传输成功',
+            //         'status' : 200
+            //     },
+            // })
         }
     }
 }

@@ -10,6 +10,7 @@ import { RedisService } from './redis/redis.service';
 import { BookService } from './book/book.service';
 import { BookController } from './book/book.controller';
 import { BookModule } from './book/book.module';
+import { MenuModule } from './menu/menu.module';
 
 
 
@@ -27,7 +28,7 @@ import { BookModule } from './book/book.module';
     synchronize: true,
     //自动加载实体
     // autoLoadEntities:true,
-  }), UserModule, AuthModule, BookModule,  ],
+  }), UserModule, AuthModule, BookModule, MenuModule,  ],
   controllers: [AppController, BookController],
   providers: [AppService, RedisService, BookService],
 })
