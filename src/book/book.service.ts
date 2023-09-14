@@ -32,4 +32,20 @@ export class BookService {
         }
     }
 
+    public async searchBook(name: string){
+        let theBook =  await this.book.createQueryBuilder('Book')
+        .where("name = :name", { name :name })
+        .getOne()
+        if(theBook){
+            return this.response = {
+                code: 0,
+                msg: theBook
+            }
+        } else {
+            return this.response = {
+                code: 1,
+                msg: "查无此书"
+            }
+        }
+    }
 }
