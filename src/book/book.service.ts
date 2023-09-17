@@ -48,4 +48,16 @@ export class BookService {
             }
         }
     }
+
+    public async lendBook(book: Book){
+
+    }
+
+    public async returnBook(book: Book){
+        
+    }
+
+    public async delBook(id: number){
+        
+    }
 }

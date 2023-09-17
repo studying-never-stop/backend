@@ -8,6 +8,9 @@ export class Book {
   @Column({ type: "varchar", length: 30 })
   name: string;
 
+  @Column({ type: "varchar", length: 30 })
+  writer: string;
+
   @Column({ type: "int", default: 0 })
   bereadtimes: number;
 
