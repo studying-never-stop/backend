@@ -30,7 +30,7 @@ import { Book } from './entity/book.entity';
     //自动加载实体
     // autoLoadEntities:true,
   }), UserModule, AuthModule, BookModule, MenuModule,  ],
-  controllers: [AppController, BookController],
+  controllers: [AppController],
   providers: [AppService, RedisService],
 })
 export class AppModule {

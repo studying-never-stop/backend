@@ -68,6 +68,11 @@ export class UserController {
         return this.userService.delUser(id)
     }
 
+    @Put("addReadTime/:id")
+    addReadTime(@Param('id') id: number){
+        return this.userService.addReadTime(id)
+    }
+
 }
 
 

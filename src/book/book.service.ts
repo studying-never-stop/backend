@@ -32,32 +32,99 @@ export class BookService {
         }
     }
 
-    public async searchBook(name: string){
-        let theBook =  await this.book.createQueryBuilder('Book')
-        .where("name = :name", { name :name })
-        .getOne()
-        if(theBook){
-            return this.response = {
-                code: 0,
-                msg: theBook
-            }
+    public async getBook(msg: any){
+        const query: string = msg.query
+        const pagenum: number = msg.pagenum
+        const pagesize: number = msg.pagesize
+        let thelist = []
+        let total: number
+        let Books: any
+
+        if(query == ''){
+            Books =  await this.book.createQueryBuilder('Book')
+            .getMany()
         } else {
-            return this.response = {
-                code: 1,
-                msg: "查无此书"
+            Books =  await this.book.createQueryBuilder('Book')
+            .where("writer = :writer", {writer: query})
+            .orWhere("name = :name", { name: query })
+            .getMany()
+        }
+
+        total = Books.length
+        let startNumber: number = (pagenum-1)*pagesize
+        let endNumber: number = pagenum*pagesize < total ? pagenum*pagesize : total
+
+        for (let i = startNumber; i < endNumber; i++){
+            thelist.push(Books[i])
+            }
+
+        return {
+            code: 0,
+            msg: {
+                data: thelist,
+                total: total
             }
         }
     }
 
-    public async lendBook(book: Book){
-
+    public async lendBook(id: number){
+        return await this.book.createQueryBuilder('Book')
+        .update(Book)
+        .set({
+            keep: false
+        })
+        .where("id = :id", {id: id})
+        .execute()
+        .then(() =>{
+            return this.response = {
+                code: 0,
+                msg: "成功借出",
+            }
+        })
     }
 
-    public async returnBook(book: Book){
-        
+    public async returnBook(id: number){
+        return await this.book.createQueryBuilder('Book')
+        .update(Book)
+        .set({
+            keep: true,
+            bereadtimes: () => "'bereadtimes' + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+        .then(() =>{
+            return this.response = {
+                code: 0,
+                msg: "归还成功",
+            }
+        })
     }
 
     public async delBook(id: number){
-        
+        return await this.book.createQueryBuilder('Book')
+        .delete()
+        .from(Book)
+        .where("id = :id", { id: id })
+        .execute()
+        .then(() =>{
+            return this.response = {
+                code: 0,
+                msg: "此书删除成功",
+            }
+        })
+    }
+
+    public async editBook(book: Book, id: number){
+        return await this.book.createQueryBuilder('User')
+            .update(Book)
+            .set(book)
+            .where("id = :id", { id: id })
+            .execute()
+            .then(() =>{
+                return this.response = {
+                    code: 0,
+                    msg: "本书修改成功",
+                }
+            })
     }
 }

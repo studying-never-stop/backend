@@ -129,7 +129,22 @@ export class UserService {
                     code: 0,
                     msg: "用户删除成功",
                 }
-            })
-        
+            })        
+    }
+
+    public async addReadTime( id: number){
+        return await this.user.createQueryBuilder('User')
+        .update(User)
+        .set({
+            readtimes: () => "'readtimes' + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+        .then(() =>{
+            return this.response = {
+                code: 0,
+                msg: "添加成功",
+            }
+        })
     }
 }
