@@ -8,12 +8,13 @@ import { AppModule } from 'src/app.module';
 import { RedisService } from 'src/redis/redis.service';
 import { RedisModule } from 'src/redis/redis.module';
 
-
 @Module({
   imports:[TypeOrmModule.forFeature([User]),RedisModule],
   providers: [UserService, RedisService],
-  controllers: [UserController]
+  controllers: [UserController],
+  //导出service模块
+  exports:[UserService]
 })
 export class UserModule {
-
+  
 }

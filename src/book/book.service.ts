@@ -67,39 +67,6 @@ export class BookService {
         }
     }
 
-    public async lendBook(id: number){
-        return await this.book.createQueryBuilder('Book')
-        .update(Book)
-        .set({
-            keep: false
-        })
-        .where("id = :id", {id: id})
-        .execute()
-        .then(() =>{
-            return this.response = {
-                code: 0,
-                msg: "成功借出",
-            }
-        })
-    }
-
-    public async returnBook(id: number){
-        return await this.book.createQueryBuilder('Book')
-        .update(Book)
-        .set({
-            keep: true,
-            bereadtimes: () => "'bereadtimes' + 1"
-        })
-        .where("id = :id", {id: id})
-        .execute()
-        .then(() =>{
-            return this.response = {
-                code: 0,
-                msg: "归还成功",
-            }
-        })
-    }
-
     public async delBook(id: number){
         return await this.book.createQueryBuilder('Book')
         .delete()
@@ -126,5 +93,31 @@ export class BookService {
                     msg: "本书修改成功",
                 }
             })
+    }
+
+    public async lend(id: number){
+        return await this.book.createQueryBuilder('Book')
+        .update(Book)
+        .set({
+            keep: false,
+            bereadtimes: () => "'bereadtimes' + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+    }
+
+    public async return(id: number){
+        return await this.book.createQueryBuilder('Book')
+        .update(Book)
+        .set({
+            keep: true,
+            // bereadtimes: () => "'bereadtimes' + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+    }
+
+    public async findBook(id: number){
+        return await this.book.findOneBy({id})
     }
 }

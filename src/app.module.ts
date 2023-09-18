@@ -12,6 +12,8 @@ import { BookController } from './book/book.controller';
 import { BookModule } from './book/book.module';
 import { MenuModule } from './menu/menu.module';
 import { Book } from './entity/book.entity';
+import { SwitchModule } from './switch/switch.module';
+import { Switch } from './entity/switch.entity';
 
 
 
@@ -25,11 +27,11 @@ import { Book } from './entity/book.entity';
     username: 'root',
     password: 'wsy021031',
     database: 'library',
-    entities: [User,Book],
+    entities: [User,Book,Switch],
     synchronize: true,
     //自动加载实体
     // autoLoadEntities:true,
-  }), UserModule, AuthModule, BookModule, MenuModule,  ],
+  }), UserModule, AuthModule, BookModule, MenuModule, SwitchModule,  ],
   controllers: [AppController],
   providers: [AppService, RedisService],
 })

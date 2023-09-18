@@ -147,4 +147,48 @@ export class UserService {
             }
         })
     }
+
+    public async lend(id: number){
+        return await this.user.createQueryBuilder('User')
+        .update(User)
+        .set({
+            state: () => "reading",
+            lendnumber: () => "'lendnumber' + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+    }
+
+    public async return(id: number){
+        let lendnum: any = this.checknumber(id);
+        if(lendnum.lendnumber == 1){
+            return await this.user.createQueryBuilder('User')
+            .update(User)
+            .set({
+                state: () => "free",
+                lendnumber: () => "'lendnumber' - 1"
+            })
+            .where("id = :id", {id: id})
+            .execute()
+        } else {
+            return await this.user.createQueryBuilder('User')
+            .update(User)
+            .set({
+                lendnumber: () => "'lendnumber' - 1"
+            })
+            .where("id = :id", {id: id})
+            .execute()
+        }
+    }
+
+    public async checknumber(id: number){
+        return await this.user.createQueryBuilder('User')
+        .select("User.lendnumber")
+        .where("id = :id", { id: id })
+        .getOne()
+    }
+
+    public async findUser(id: number){
+        return await this.user.findOneBy({id})
+    }
 }

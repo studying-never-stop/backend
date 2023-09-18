@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeor
 
 //创建枚举类型(自定义类型)
 export type UserRoleType = "admin" | "common"
+export type stateType = "reading" | "free"
 
 @Entity('User')
 export class User {
@@ -27,11 +28,18 @@ export class User {
 })
   role: UserRoleType[];
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({
+    type: "enum",
+    enum: ["reading" , "free"],
+    default: "free"
+})
+  state: stateType[];
 
   @Column({ type:'int', default:0 })
   readtimes: number;
+
+  @Column({ type:'int', default:0 })
+  lendnumber: number;
 
   @Column({ type:'varchar' })
   salt:string;
