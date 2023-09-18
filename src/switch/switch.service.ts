@@ -8,6 +8,7 @@ import { IResponse } from 'src/utils/response';
 import { UserService } from 'src/user/user.service';
 import { BookService } from 'src/book/book.service'; 
 import { User } from 'src/entity/user.entity';
+import { Book } from 'src/entity/book.entity';
 
 @Injectable()
 export class SwitchService {
@@ -23,34 +24,36 @@ export class SwitchService {
         let userid: number = data.userid;
         let bookid: number = data.bookid;
 
-
-        let user: User= await this.userService.checknumber(userid);
-        console.log(user.lendnumber)
+        let user: User= await this.userService.findUser(userid);
+        let book: Book= await this.bookService.findBook(bookid);
+        
         if(user.lendnumber == 5){
             return this.response = {
                 code: 1,
                 msg:"已达到借书上限，请先归还一些书后再接"
             }
         } else {
-            let user = await this.userService.findUser(userid);
-            let book = await this.bookService.findBook(bookid);
-
-            const msg = this.Switch.create({
-                actioner: user.name,
-                book: book.name,
-                acttype: ["lend"],
-            });
-            console.log(msg)
-            await this.userService.lend(userid);
-            await this.bookService.lend(bookid);
-            await this.userService.addReadTime(userid);
-            await this.Switch
-            .save(msg)
-            return this.response = {
-                code: 0,
-                msg: "借书成功"
+            if(book.keep == true){
+                const msg = this.Switch.create({
+                    actioner: user.name,
+                    book: book.name,
+                    acttype: ["lend"],
+                });
+                await this.userService.lend(userid);
+                await this.bookService.lend(bookid);
+                await this.userService.addReadTime(userid);
+                await this.Switch
+                .save(msg)
+                return this.response = {
+                    code: 0,
+                    msg: "借书成功"
+                }
+            } else {
+                return this.response = {
+                    code: 1,
+                    msg: "此书已被借出，请下次再借"
+                }
             }
-            
         }
     }
 

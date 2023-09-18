@@ -136,7 +136,7 @@ export class UserService {
         return await this.user.createQueryBuilder('User')
         .update(User)
         .set({
-            readtimes: () => "'readtimes' + 1"
+            readtimes: () => "readtimes + 1"
         })
         .where("id = :id", {id: id})
         .execute()
@@ -152,21 +152,24 @@ export class UserService {
         return await this.user.createQueryBuilder('User')
         .update(User)
         .set({
-            state: () => "reading",
-            lendnumber: () => "'lendnumber' + 1"
+            state: ["reading"],
+            //双引号里的属性名称不用加单引号
+            lendnumber: () => "lendnumber + 1"
         })
         .where("id = :id", {id: id})
         .execute()
     }
 
     public async return(id: number){
-        let lendnum: any = this.checknumber(id);
+        let lendnum: any= await this.checknumber(id);
+
         if(lendnum.lendnumber == 1){
             return await this.user.createQueryBuilder('User')
             .update(User)
             .set({
-                state: () => "free",
-                lendnumber: () => "'lendnumber' - 1"
+                //修改或发送枚举类型的属性写成[""]
+                state: ["free"],
+                lendnumber: () => "lendnumber - 1"
             })
             .where("id = :id", {id: id})
             .execute()
@@ -174,7 +177,7 @@ export class UserService {
             return await this.user.createQueryBuilder('User')
             .update(User)
             .set({
-                lendnumber: () => "'lendnumber' - 1"
+                lendnumber: () => "lendnumber - 1"
             })
             .where("id = :id", {id: id})
             .execute()
@@ -183,7 +186,7 @@ export class UserService {
 
     public async checknumber(id: number){
         return await this.user.createQueryBuilder('User')
-        .select("User.lendnumber")
+        .select("User.lendnumber") //如果没有form，select里一定要加表的名称
         .where("id = :id", { id: id })
         .getOne()
     }

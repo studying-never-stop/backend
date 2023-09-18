@@ -100,7 +100,7 @@ export class BookService {
         .update(Book)
         .set({
             keep: false,
-            bereadtimes: () => "'bereadtimes' + 1"
+            bereadtimes: () => "bereadtimes + 1"
         })
         .where("id = :id", {id: id})
         .execute()
@@ -111,7 +111,7 @@ export class BookService {
         .update(Book)
         .set({
             keep: true,
-            // bereadtimes: () => "'bereadtimes' + 1"
+            // bereadtimes: () => "bereadtimes + 1"
         })
         .where("id = :id", {id: id})
         .execute()
@@ -120,4 +120,5 @@ export class BookService {
     public async findBook(id: number){
         return await this.book.findOneBy({id})
     }
+
 }

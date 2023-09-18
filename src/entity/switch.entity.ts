@@ -17,6 +17,7 @@ export class Switch {
   @Column({
     type: "enum",
     enum: ["lend" , "return"],
+    default: "lend"
 })
   acttype: actionType[];
 
