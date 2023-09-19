@@ -7,13 +7,23 @@ import { SwitchService } from './switch.service';
 export class SwitchController {
     constructor(private switchService: SwitchService){}
 
-    @Post('lendBook')
+    @Post('addRecord')
     public async lendBook(@Body() data: any){
-        return this.switchService.lendBook(data)
+        if (data.acttype == 'lend'){
+            return this.switchService.lendBook(data)
+        } else {
+            return this.switchService.returnBook(data)
+        }
+        
     }
 
-    @Post('returnBook')
-    public async returnBook(@Body() data: any){
-        return this.switchService.returnBook(data)
+    // @Post('returnBook')
+    // public async returnBook(@Body() data: any){
+    //     return this.switchService.returnBook(data)
+    // }
+
+    @Post('getRecord')
+    public async getRecord(@Body() msg: any){
+        return this.switchService.getInformation(msg)
     }
 }

@@ -47,6 +47,7 @@ export class BookService {
             Books =  await this.book.createQueryBuilder('Book')
             .where("writer = :writer", {writer: query})
             .orWhere("name = :name", { name: query })
+            .orWhere("kind = :kind", { kind: query})
             .getMany()
         }
 
@@ -117,8 +118,8 @@ export class BookService {
         .execute()
     }
 
-    public async findBook(id: number){
-        return await this.book.findOneBy({id})
+    public async findBook(name: string){
+        return await this.book.findOneBy({name})
     }
 
 }

@@ -191,7 +191,7 @@ export class UserService {
         .getOne()
     }
 
-    public async findUser(id: number){
-        return await this.user.findOneBy({id})
+    public async findUser(name: string){
+        return await this.user.findOneBy({name})
     }
 }

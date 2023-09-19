@@ -21,12 +21,12 @@ export class SwitchService {
     ){    }
 
     public async lendBook(data: any){
-        let userid: number = data.userid;
-        let bookid: number = data.bookid;
+        let username: string = data.actor;
+        let bookname: string = data.book;
 
-        let user: User= await this.userService.findUser(userid);
-        let book: Book= await this.bookService.findBook(bookid);
-        
+        let user: User= await this.userService.findUser(username);
+        let book: Book= await this.bookService.findBook(bookname);
+
         if(user.lendnumber == 5){
             return this.response = {
                 code: 1,
@@ -35,13 +35,13 @@ export class SwitchService {
         } else {
             if(book.keep == true){
                 const msg = this.Switch.create({
-                    actioner: user.name,
+                    actor: user.name,
                     book: book.name,
                     acttype: ["lend"],
                 });
-                await this.userService.lend(userid);
-                await this.bookService.lend(bookid);
-                await this.userService.addReadTime(userid);
+                await this.userService.lend(user.id);
+                await this.bookService.lend(book.id);
+                await this.userService.addReadTime(user.id);
                 await this.Switch
                 .save(msg)
                 return this.response = {
@@ -58,24 +58,87 @@ export class SwitchService {
     }
 
     public async returnBook(data: any){
-        let userid: number = data.userid;
-        let bookid: number = data.bookid;
+        let username: string = data.actor;
+        let bookname: string = data.book;
 
-        let user = await this.userService.findUser(userid);
-        let book = await this.bookService.findBook(bookid);
+        let user: User= await this.userService.findUser(username);
+        let book: Book= await this.bookService.findBook(bookname);
 
         const msg = this.Switch.create({
-            actioner: user.name,
+            actor: user.name,
             book: book.name,
             acttype: ["return"],
         });
-        await this.userService.return(userid);
-        await this.bookService.return(bookid);
+        await this.userService.return(user.id);
+        await this.bookService.return(book.id);
         await this.Switch
         .insert(msg)
         return this.response = {
             code: 0,
             msg: "还书成功"
+        }
+    }
+
+    public async getInformation(msg: any){
+        const query: string = msg.query
+        const acttype: string = msg.acttype
+        const pagenum: number = msg.pagenum
+        const pagesize: number = msg.pagesize
+        let thelist = []
+        let total: number
+        let Switchs: any
+
+        console.log(query)
+        console.log(acttype)
+        if(query == ''){
+            if(acttype == 'lend'){
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("acttype = :acttype", {acttype: acttype})
+                .getMany()
+            } else if(acttype == 'return'){
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("acttype = :acttype", {acttype: acttype})
+                .getMany()
+            } else {
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .getMany()
+            }
+        } else {
+            if(acttype == 'lend'){
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("acttype = :acttype", {acttype: acttype})
+                .andWhere("name = :name", {name: query})
+                .orWhere("writer = :writer", {writer: query})
+                .getMany()
+            } else if(acttype == 'return') {
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("acttype = :acttype", {acttype: acttype})
+                .andWhere("name = :name", {name: query})
+                .orWhere("writer = :writer", {writer: query})
+                .getMany()
+            } else {
+                Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("name = :name", {name: query})
+                .orWhere("writer = :writer", {writer: query})
+                .getMany()
+            }
+        }
+
+
+        total = Switchs.length
+        let startNumber: number = (pagenum-1)*pagesize
+        let endNumber: number = pagenum*pagesize < total ? pagenum*pagesize : total
+
+        for (let i = startNumber; i < endNumber; i++){
+            thelist.push(Switchs[i])
+            }
+
+        return {
+            code: 0,
+            msg: {
+                data: thelist,
+                total: total
+            }
         }
     }
 }

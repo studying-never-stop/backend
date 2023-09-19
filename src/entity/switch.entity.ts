@@ -9,7 +9,7 @@ export class Switch {
   id: number;
 
   @Column({ type: "varchar", length: 100 })
-  actioner: string;
+  actor: string;
 
   @Column({ type: "varchar", length: 100 })
   book: string;
