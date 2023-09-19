@@ -14,11 +14,14 @@ export class Book {
   @Column({ type: "varchar", length: 30 })
   writer: string;
 
+  @Column({ type: "int", default: 10 })
+  cost: number;
+
   @Column({ type: "int", default: 0 })
   bereadtimes: number;
 
-  @Column({ default: true })
-  keep: boolean;
+  @Column({ type: "int", default: 1 })
+  keep: number;
 
   @Column({
     type: "enum",

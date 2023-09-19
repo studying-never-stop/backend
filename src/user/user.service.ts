@@ -61,7 +61,8 @@ export class UserService {
             .addSelect( 'User.phone' )
             .addSelect( 'User.email' )
             .addSelect( 'User.role' )
-            .addSelect( 'User.readtimes' )
+            .addSelect( 'User.lendnumber' )
+            .addSelect( 'User.buynumber' )
             // .addSelect('role' )
             //同where的用法
             // .where("user.id = :id", { id: 1 })
@@ -81,7 +82,8 @@ export class UserService {
             .addSelect( 'User.phone' )
             .addSelect( 'User.email' )
             .addSelect( 'User.role' )
-            .addSelect( 'User.readtimes' )
+            .addSelect( 'User.lendnumber' )
+            .addSelect( 'User.buynumber' )
             .where("User.name = :name", { name: query })
             .orWhere("User.phone = :phone", { phone: query }) //或者用另一个where查询
             .getOne();
@@ -132,11 +134,11 @@ export class UserService {
             })        
     }
 
-    public async addReadTime( id: number){
+    public async addbuy( id: number ){
         return await this.user.createQueryBuilder('User')
         .update(User)
         .set({
-            readtimes: () => "readtimes + 1"
+            buynumber: () => "buynumber + 1"
         })
         .where("id = :id", {id: id})
         .execute()
@@ -184,6 +186,16 @@ export class UserService {
         }
     }
 
+    public async buy(id: number){
+        return await this.user.createQueryBuilder('User')
+        .update(User)
+        .set({
+            buynumber: () => "buynumber + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+    }
+
     public async checknumber(id: number){
         return await this.user.createQueryBuilder('User')
         .select("User.lendnumber") //如果没有form，select里一定要加表的名称
@@ -193,5 +205,21 @@ export class UserService {
 
     public async findUser(name: string){
         return await this.user.findOneBy({name})
+    }
+
+    public async countAllUser(){
+        return await this.user.count()
+    }
+
+    public async countBuyNumber(num: number){
+        return await this.user.createQueryBuilder('User')
+        .where("buynumber >= :buynumber", {buynumber: num})
+        .getCount()
+    }
+
+    public async countState(){
+        return await this.user.createQueryBuilder('User')
+        .where("state = :state", {state: 'reading'})
+        .getCount()
     }
 }

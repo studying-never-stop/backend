@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 //创建枚举类型(自定义类型)
-export type actionType = "lend" | "return"
+export type actionType = "lend" | "return" | "buy"
 
 @Entity('Switch')
 export class Switch {
@@ -16,8 +16,8 @@ export class Switch {
 
   @Column({
     type: "enum",
-    enum: ["lend" , "return"],
-    default: "lend"
+    enum: ["lend" , "return" , "buy"],
+    default: "buy"
 })
   acttype: actionType[];
 

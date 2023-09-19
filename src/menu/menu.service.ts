@@ -62,18 +62,11 @@ export class MenuService {
                 'children': [
                         {
                             'id': '114',
-                            'authName': '借阅管理',
-                            'path': 'lend',
+                            'authName': '借阅记录',
+                            'path': 'record',
                             'icon': 3,
                             'children': [],
-                        },
-                        {
-                            'id': '115',
-                            'authName': '归还管理',
-                            'path': 'return',
-                            'icon': 6,
-                            'children': [],
-                        },
+                        }
                     ],
                 'order' : 4,
             },

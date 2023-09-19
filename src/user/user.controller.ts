@@ -59,7 +59,6 @@ export class UserController {
 
     @Put("editUser/:id")
     editUser(@Body() user: User, @Param('id') id: number){
-        console.log(id)
         return this.userService.editUser(user, id)
     }
 

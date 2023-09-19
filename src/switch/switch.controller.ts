@@ -11,8 +11,10 @@ export class SwitchController {
     public async lendBook(@Body() data: any){
         if (data.acttype == 'lend'){
             return this.switchService.lendBook(data)
-        } else {
+        } else if(data.acttype == 'return') {
             return this.switchService.returnBook(data)
+        } else{
+            return this.switchService.buyBook(data)
         }
         
     }

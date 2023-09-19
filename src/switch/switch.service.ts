@@ -33,7 +33,7 @@ export class SwitchService {
                 msg:"已达到借书上限，请先归还一些书后再接"
             }
         } else {
-            if(book.keep == true){
+            if(book.keep != 0){
                 const msg = this.Switch.create({
                     actor: user.name,
                     book: book.name,
@@ -41,7 +41,6 @@ export class SwitchService {
                 });
                 await this.userService.lend(user.id);
                 await this.bookService.lend(book.id);
-                await this.userService.addReadTime(user.id);
                 await this.Switch
                 .save(msg)
                 return this.response = {
@@ -51,7 +50,7 @@ export class SwitchService {
             } else {
                 return this.response = {
                     code: 1,
-                    msg: "此书已被借出，请下次再借"
+                    msg: "此书已无库存，请下次再借"
                 }
             }
         }
@@ -79,6 +78,41 @@ export class SwitchService {
         }
     }
 
+    public async buyBook(data: any){
+        let username: string = data.actor;
+        let bookname: string = data.book;
+
+        let user: User= await this.userService.findUser(username);
+        let book: Book= await this.bookService.findBook(bookname);
+
+        if(user.lendnumber == 5){
+            return this.response = {
+                code: 1,
+                msg:"已达到借书上限，请先归还一些书后再接"
+            }
+        } else if(book.keep != 0) {
+            const msg = this.Switch.create({
+                actor: user.name,
+                book: book.name,
+                acttype: ["buy"],
+            });
+            await this.userService.buy(user.id);
+            await this.bookService.buy(book.id);
+            await this.Switch
+            .insert(msg)
+            return this.response = {
+                code: 0,
+                msg: "买书成功"
+            }
+        } else {
+            return this.response = {
+                code: 1,
+                msg: "已无库存，请下次再买"
+            }
+        }
+        
+    }
+
     public async getInformation(msg: any){
         const query: string = msg.query
         const acttype: string = msg.acttype
@@ -88,38 +122,26 @@ export class SwitchService {
         let total: number
         let Switchs: any
 
-        console.log(query)
-        console.log(acttype)
         if(query == ''){
-            if(acttype == 'lend'){
+            if(acttype == ''){
                 Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("acttype = :acttype", {acttype: acttype})
-                .getMany()
-            } else if(acttype == 'return'){
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("acttype = :acttype", {acttype: acttype})
                 .getMany()
             } else {
                 Switchs =  await this.Switch.createQueryBuilder('Switch')
+                .where("acttype = :acttype", {acttype: acttype})
                 .getMany()
-            }
+            } 
         } else {
-            if(acttype == 'lend'){
+            if(acttype == ''){
                 Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("acttype = :acttype", {acttype: acttype})
-                .andWhere("name = :name", {name: query})
-                .orWhere("writer = :writer", {writer: query})
-                .getMany()
-            } else if(acttype == 'return') {
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("acttype = :acttype", {acttype: acttype})
-                .andWhere("name = :name", {name: query})
-                .orWhere("writer = :writer", {writer: query})
+                .where("actor = :actor", {actor: query})
+                .orWhere("book = :book", {book: query})
                 .getMany()
             } else {
                 Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("name = :name", {name: query})
-                .orWhere("writer = :writer", {writer: query})
+                .where("actor = :actor", {actor: query})
+                .orWhere("book = :book", {book: query})
+                .andWhere("acttype = :acttype", {acttype: acttype})
                 .getMany()
             }
         }
@@ -140,5 +162,28 @@ export class SwitchService {
                 total: total
             }
         }
+    }
+
+    /**
+     * 数据获取总控件
+     */
+    public async getData(msg: any){
+        
+    }
+
+    public async countLendNum(){
+        return await this.Switch.createQueryBuilder("Switch")
+        .where("acttype = :acttype", {acttype: 'lend'})
+        .getCount()
+    }
+
+    public async countReturnNum(){
+        return await this.Switch.createQueryBuilder("Switch")
+        .where("acttype = :acttype", {acttype: 'return'})
+        .getCount()
+    }
+
+    public async countAllSwitch(){
+        return await this.Switch.count()
     }
 }

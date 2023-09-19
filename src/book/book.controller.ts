@@ -18,13 +18,11 @@ export class BookController {
 
     @Put("editBook/:id")
     editUser(@Body() book: Book, @Param('id') id: number){
-        console.log(id)
         return this.bookService.editBook(book, id)
     }
 
     @Delete("delBook/:id")
     delUser( @Param('id') id: number){
-        console.log(id)
         return this.bookService.delBook(id)
     }
 }

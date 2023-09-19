@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 //创建枚举类型(自定义类型)
-export type UserRoleType = "admin" | "common"
+export type UserRoleType = "admin" | "common" | "vip"
 export type stateType = "reading" | "free"
 
 @Entity('User')
@@ -23,7 +23,7 @@ export class User {
 
   @Column({
     type: "enum",
-    enum: ["admin", "common"],
+    enum: ["admin", "common", "vip"],
     default: "common"
 })
   role: UserRoleType[];
@@ -36,7 +36,7 @@ export class User {
   state: stateType[];
 
   @Column({ type:'int', default:0 })
-  readtimes: number;
+  buynumber: number;
 
   @Column({ type:'int', default:0 })
   lendnumber: number;

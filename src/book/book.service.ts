@@ -34,6 +34,7 @@ export class BookService {
 
     public async getBook(msg: any){
         const query: string = msg.query
+        const kind: string = msg.kind
         const pagenum: number = msg.pagenum
         const pagesize: number = msg.pagesize
         let thelist = []
@@ -41,14 +42,27 @@ export class BookService {
         let Books: any
 
         if(query == ''){
-            Books =  await this.book.createQueryBuilder('Book')
-            .getMany()
+            if(kind == ''){
+                Books =  await this.book.createQueryBuilder('Book')
+                .getMany()
+            } else {
+                Books =  await this.book.createQueryBuilder('Book')
+                .where("kind = :kind", { kind: kind})
+                .getMany()
+            } 
         } else {
-            Books =  await this.book.createQueryBuilder('Book')
-            .where("writer = :writer", {writer: query})
-            .orWhere("name = :name", { name: query })
-            .orWhere("kind = :kind", { kind: query})
-            .getMany()
+            if(kind == ''){
+                Books =  await this.book.createQueryBuilder('Book')
+                .where("writer = :writer", {writer: query})
+                .orWhere("name = :name", { name: query })
+                .getMany()
+            } else {
+                Books =  await this.book.createQueryBuilder('Book')
+                .where("writer = :writer", {writer: query})
+                .orWhere("name = :name", { name: query })
+                .andWhere("kind = :kind", { kind: kind})
+                .getMany()
+            }
         }
 
         total = Books.length
@@ -100,7 +114,7 @@ export class BookService {
         return await this.book.createQueryBuilder('Book')
         .update(Book)
         .set({
-            keep: false,
+            keep: () => "keep - 1",
             bereadtimes: () => "bereadtimes + 1"
         })
         .where("id = :id", {id: id})
@@ -111,8 +125,19 @@ export class BookService {
         return await this.book.createQueryBuilder('Book')
         .update(Book)
         .set({
-            keep: true,
+            keep: () => "keep + 1",
             // bereadtimes: () => "bereadtimes + 1"
+        })
+        .where("id = :id", {id: id})
+        .execute()
+    }
+
+    public async buy(id: number){
+        return await this.book.createQueryBuilder('Book')
+        .update(Book)
+        .set({
+            keep: () => "keep - 1",
+            bereadtimes: () => "bereadtimes + 1"
         })
         .where("id = :id", {id: id})
         .execute()
@@ -122,4 +147,25 @@ export class BookService {
         return await this.book.findOneBy({name})
     }
 
+    public async countBooks(){
+        return await this.book.count()
+    }
+
+    public async countKind(kind: string){
+        return await this.book.createQueryBuilder('Book')
+        .where("kind = :kind", {kind: kind})
+        .getCount() 
+    }
+
+    public async countReadtime(num: number){
+        return await this.book.createQueryBuilder('Book')
+        .where("bereadtimes >= :bereadtimes", {bereadtimes: num})
+        .getCount() 
+    }
+
+    public async countKeep(){
+        return await this.book.createQueryBuilder('Book')
+        .where("keep = :keep", {keep: true})
+        .getCount() 
+    } 
 }
