@@ -28,4 +28,9 @@ export class SwitchController {
     public async getRecord(@Body() msg: any){
         return this.switchService.getInformation(msg)
     }
+
+    @Post('getData')
+    public async getData(@Body() request: any){
+        return await this.switchService.getData(request)
+    }
 }

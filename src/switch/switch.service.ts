@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { BookService } from 'src/book/book.service'; 
 import { User } from 'src/entity/user.entity';
 import { Book } from 'src/entity/book.entity';
+import { BasePrivateKeyEncodingOptions } from 'crypto';
 
 @Injectable()
 export class SwitchService {
@@ -168,6 +169,28 @@ export class SwitchService {
      * 数据获取总控件
      */
     public async getData(msg: any){
+        let request = msg.request
+        
+        switch(request){
+            case ('usernumber'):
+                await this.usernmuber(msg)
+                break;
+            case ('kindofbook'):
+                await this.kindOfBook(msg)
+                break;
+            case ('leftbook'):
+                await this.leftBook()
+                break;
+            case ('monthchange'):
+                await this.monthchange(msg)
+                break;
+            default:
+                return this.response = {
+                    code: 1,
+                    msg: "无找到相应数据"
+                }
+        }
+        
         
     }
 
@@ -177,13 +200,42 @@ export class SwitchService {
         .getCount()
     }
 
-    public async countReturnNum(){
+    public async countSellNum(){
         return await this.Switch.createQueryBuilder("Switch")
-        .where("acttype = :acttype", {acttype: 'return'})
+        .where("acttype = :acttype", {acttype: 'buy'})
         .getCount()
     }
 
     public async countAllSwitch(){
         return await this.Switch.count()
+    }
+
+    public async kindOfBook(msg: any){
+
+    }
+
+    public async leftBook(){
+        let keepbook: number = await this.bookService.countBooks()
+        let sell: number = await this.countSellNum()
+        let lend: number = await this.countLendNum()
+        let data = [
+            { value: keepbook, name: 'keep' },
+            { value: sell, name: 'lend' },
+            { value: lend, name: 'sell' }
+          ]
+        
+          console.log(data)
+          return this.response = {
+            code: 0,
+            msg: data
+          }
+    }
+
+    public async usernmuber(msg: any){
+
+    }
+
+    public async monthchange(msg: any){
+
     }
 }
