@@ -3,10 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { Admin, ListCollectionsCursor, Repository, } from 'typeorm';
 //注入数据库
 import { InjectRepository } from '@nestjs/typeorm';
-import { Switch } from 'src/entity/switch.entity'; 
+import { Switch } from 'src/entity/switch.entity';
 import { IResponse } from 'src/utils/response';
-import { UserService } from 'src/user/user.service';
-import { BookService } from 'src/book/book.service'; 
+import { UserService } from 'src/control/user/user.service';
+import { BookService } from 'src/control/book/book.service';
 import { User } from 'src/entity/user.entity';
 import { Book } from 'src/entity/book.entity';
 import { BasePrivateKeyEncodingOptions } from 'crypto';
@@ -17,24 +17,24 @@ export class SwitchService {
     constructor(
         private userService: UserService,
         private bookService: BookService,
-        @InjectRepository(Switch) 
-        private readonly Switch : Repository<Switch>,
-    ){    }
+        @InjectRepository(Switch)
+        private readonly Switch: Repository<Switch>,
+    ) { }
 
-    public async lendBook(data: any){
+    public async lendBook(data: any) {
         let username: string = data.actor;
         let bookname: string = data.book;
 
-        let user: User= await this.userService.findUser(username);
-        let book: Book= await this.bookService.findBook(bookname);
+        let user: User = await this.userService.findUser(username);
+        let book: Book = await this.bookService.findBook(bookname);
 
-        if(user.lendnumber == 5){
+        if (user.lendnumber == 5) {
             return this.response = {
                 code: 1,
-                msg:"已达到借书上限，请先归还一些书后再接"
+                msg: "已达到借书上限，请先归还一些书后再接"
             }
         } else {
-            if(book.keep != 0){
+            if (book.keep != 0) {
                 const msg = this.Switch.create({
                     actor: user.name,
                     book: book.name,
@@ -43,7 +43,7 @@ export class SwitchService {
                 await this.userService.lend(user.id);
                 await this.bookService.lend(book.id);
                 await this.Switch
-                .save(msg)
+                    .save(msg)
                 return this.response = {
                     code: 0,
                     msg: "借书成功"
@@ -57,12 +57,12 @@ export class SwitchService {
         }
     }
 
-    public async returnBook(data: any){
+    public async returnBook(data: any) {
         let username: string = data.actor;
         let bookname: string = data.book;
 
-        let user: User= await this.userService.findUser(username);
-        let book: Book= await this.bookService.findBook(bookname);
+        let user: User = await this.userService.findUser(username);
+        let book: Book = await this.bookService.findBook(bookname);
 
         const msg = this.Switch.create({
             actor: user.name,
@@ -72,26 +72,26 @@ export class SwitchService {
         await this.userService.return(user.id);
         await this.bookService.return(book.id);
         await this.Switch
-        .insert(msg)
+            .insert(msg)
         return this.response = {
             code: 0,
             msg: "还书成功"
         }
     }
 
-    public async buyBook(data: any){
+    public async buyBook(data: any) {
         let username: string = data.actor;
         let bookname: string = data.book;
 
-        let user: User= await this.userService.findUser(username);
-        let book: Book= await this.bookService.findBook(bookname);
+        let user: User = await this.userService.findUser(username);
+        let book: Book = await this.bookService.findBook(bookname);
 
-        if(user.lendnumber == 5){
+        if (user.lendnumber == 5) {
             return this.response = {
                 code: 1,
-                msg:"已达到借书上限，请先归还一些书后再接"
+                msg: "已达到借书上限，请先归还一些书后再接"
             }
-        } else if(book.keep != 0) {
+        } else if (book.keep != 0) {
             const msg = this.Switch.create({
                 actor: user.name,
                 book: book.name,
@@ -100,7 +100,7 @@ export class SwitchService {
             await this.userService.buy(user.id);
             await this.bookService.buy(book.id);
             await this.Switch
-            .insert(msg)
+                .insert(msg)
             return this.response = {
                 code: 0,
                 msg: "买书成功"
@@ -111,10 +111,10 @@ export class SwitchService {
                 msg: "已无库存，请下次再买"
             }
         }
-        
+
     }
 
-    public async getInformation(msg: any){
+    public async getInformation(msg: any) {
         const query: string = msg.query
         const acttype: string = msg.acttype
         const pagenum: number = msg.pagenum
@@ -123,38 +123,38 @@ export class SwitchService {
         let total: number
         let Switchs: any
 
-        if(query == ''){
-            if(acttype == ''){
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .getMany()
+        if (query == '') {
+            if (acttype == '') {
+                Switchs = await this.Switch.createQueryBuilder('Switch')
+                    .getMany()
             } else {
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("acttype = :acttype", {acttype: acttype})
-                .getMany()
-            } 
+                Switchs = await this.Switch.createQueryBuilder('Switch')
+                    .where("acttype = :acttype", { acttype: acttype })
+                    .getMany()
+            }
         } else {
-            if(acttype == ''){
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("actor = :actor", {actor: query})
-                .orWhere("book = :book", {book: query})
-                .getMany()
+            if (acttype == '') {
+                Switchs = await this.Switch.createQueryBuilder('Switch')
+                    .where("actor = :actor", { actor: query })
+                    .orWhere("book = :book", { book: query })
+                    .getMany()
             } else {
-                Switchs =  await this.Switch.createQueryBuilder('Switch')
-                .where("actor = :actor", {actor: query})
-                .orWhere("book = :book", {book: query})
-                .andWhere("acttype = :acttype", {acttype: acttype})
-                .getMany()
+                Switchs = await this.Switch.createQueryBuilder('Switch')
+                    .where("actor = :actor", { actor: query })
+                    .orWhere("book = :book", { book: query })
+                    .andWhere("acttype = :acttype", { acttype: acttype })
+                    .getMany()
             }
         }
 
 
         total = Switchs.length
-        let startNumber: number = (pagenum-1)*pagesize
-        let endNumber: number = pagenum*pagesize < total ? pagenum*pagesize : total
+        let startNumber: number = (pagenum - 1) * pagesize
+        let endNumber: number = pagenum * pagesize < total ? pagenum * pagesize : total
 
-        for (let i = startNumber; i < endNumber; i++){
+        for (let i = startNumber; i < endNumber; i++) {
             thelist.push(Switchs[i])
-            }
+        }
 
         return {
             code: 0,
@@ -168,21 +168,21 @@ export class SwitchService {
     /**
      * 数据获取总控件
      */
-    public async getData(msg: any){
+    public async getData(msg: any) {
         let request = msg.request
-        
-        switch(request){
+
+        switch (request) {
             case ('usernumber'):
-                await this.usernmuber(msg)
+                return await this.usernmuber(msg)
                 break;
             case ('kindofbook'):
-                await this.kindOfBook(msg)
+                return await this.kindOfBook(msg)
                 break;
             case ('leftbook'):
-                await this.leftBook()
+                return await this.leftBook()
                 break;
             case ('monthchange'):
-                await this.monthchange(msg)
+                return await this.monthchange(msg)
                 break;
             default:
                 return this.response = {
@@ -190,31 +190,31 @@ export class SwitchService {
                     msg: "无找到相应数据"
                 }
         }
-        
-        
+
+
     }
 
-    public async countLendNum(){
+    public async countLendNum() {
         return await this.Switch.createQueryBuilder("Switch")
-        .where("acttype = :acttype", {acttype: 'lend'})
-        .getCount()
+            .where("acttype = :acttype", { acttype: 'lend' })
+            .getCount()
     }
 
-    public async countSellNum(){
+    public async countSellNum() {
         return await this.Switch.createQueryBuilder("Switch")
-        .where("acttype = :acttype", {acttype: 'buy'})
-        .getCount()
+            .where("acttype = :acttype", { acttype: 'buy' })
+            .getCount()
     }
 
-    public async countAllSwitch(){
+    public async countAllSwitch() {
         return await this.Switch.count()
     }
 
-    public async kindOfBook(msg: any){
+    public async kindOfBook(msg: any) {
 
     }
 
-    public async leftBook(){
+    public async leftBook() {
         let keepbook: number = await this.bookService.countBooks()
         let sell: number = await this.countSellNum()
         let lend: number = await this.countLendNum()
@@ -222,20 +222,19 @@ export class SwitchService {
             { value: keepbook, name: 'keep' },
             { value: sell, name: 'lend' },
             { value: lend, name: 'sell' }
-          ]
-        
-          console.log(data)
-          return this.response = {
+        ]
+
+        return this.response = {
             code: 0,
             msg: data
-          }
+        }
     }
 
-    public async usernmuber(msg: any){
+    public async usernmuber(msg: any) {
 
     }
 
-    public async monthchange(msg: any){
+    public async monthchange(msg: any) {
 
     }
 }
