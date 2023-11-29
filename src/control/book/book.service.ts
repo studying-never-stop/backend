@@ -55,11 +55,13 @@ export class BookService {
                 Books = await this.book.createQueryBuilder('Book')
                     .where("writer = :writer", { writer: query })
                     .orWhere("name = :name", { name: query })
+                    .orWhere("publisher = :publisher", { publisher: query })
                     .getMany()
             } else {
                 Books = await this.book.createQueryBuilder('Book')
                     .where("writer = :writer", { writer: query })
                     .orWhere("name = :name", { name: query })
+                    .orWhere("publisher = :publisher", { publisher: query })
                     .andWhere("kind = :kind", { kind: kind })
                     .getMany()
             }
