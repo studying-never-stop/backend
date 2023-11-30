@@ -8,6 +8,8 @@ import { error } from 'console';
 import { IResponse } from 'src/utils/response';
 import * as Redis from 'ioredis';
 import { RedisService } from 'src/redis/redis.service';
+import * as jwt from 'jsonwebtoken';
+import { userInfo } from 'os';
 
 
 @Injectable()
@@ -220,5 +222,57 @@ export class UserService {
         return await this.user.createQueryBuilder('User')
             .where("state = :state", { state: 'reading' })
             .getCount()
+    }
+
+    public async getUserData(authorization) {
+        const decodedPayload: string = Buffer.from(authorization, 'base64').toString();
+        const firstJSONEndIndex: number = decodedPayload.indexOf('}') + 1;
+        const secondJSONEndIndex: number = decodedPayload.indexOf('}', firstJSONEndIndex) + 1;
+        const firstPartJSONString: string = decodedPayload.substring(0, firstJSONEndIndex);
+        const secondPartJSONString: string = decodedPayload.substring(firstJSONEndIndex, secondJSONEndIndex);
+
+        // 解析第一个JSON对象
+        let firstPartJSON: any;
+        try {
+            firstPartJSON = JSON.parse(firstPartJSONString);
+        } catch (error) {
+            console.error('Error parsing first part of JSON:', error);
+        }
+
+        // 解析第二个JSON对象
+        let secondPartJSON: any;
+        try {
+            secondPartJSON = JSON.parse(secondPartJSONString);
+        } catch (error) {
+            console.error('Error parsing second part of JSON:', error);
+        }
+
+        // 合并解析后的JSON对象
+        const mergedJSON = { ...firstPartJSON, ...secondPartJSON };
+
+        // 输出解码后的 JSON 
+        // console.log('Merged JSON:', mergedJSON);
+
+        const userJson = secondPartJSON;
+        const userid = userJson.id;
+
+        const userData = await this.user.createQueryBuilder('User')
+            .select("User.id")
+            .addSelect('User.name')
+            .addSelect('User.phone')
+            .addSelect('User.email')
+            .addSelect('User.role')
+            .addSelect('User.lendnumber')
+            .addSelect('User.buynumber')
+            .where("id = :id", { id: userid })
+            .getOne()
+
+        return {
+            code: 0,
+            msg: {
+                data: userData
+            }
+        }
+
     }
 }
